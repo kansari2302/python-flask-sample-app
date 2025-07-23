@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-flask-sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: python-flask-sample-app
+  template:
+    metadata:
+      labels:
+        app: python-flask-sample-app
+    spec:
+      containers:
+      - name: python-flask-sample-app
+        image: 686255978515.dkr.ecr.ap-southeast-4.amazonaws.com/python-flask-sample-app:latest
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-flask-sample-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: python-flask-sample-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
