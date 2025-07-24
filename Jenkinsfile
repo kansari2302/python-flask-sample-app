@@ -1,7 +1,13 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(name: 'STAGE_TO_RUN', choices: ['ALL', 'CHECKOUT', 'BUILD', 'PUSH', 'DEPLOY'], description: 'Select stage to run')
+    }
+
     environment {
+        APP_NAME = "python-flask-sample-app"
+        IMAGE_TAG = "${APP_NAME}:${BUILD_NUMBER}"
         AWS_REGION = 'ap-southeast-4'
         ECR_REPO = '686255978515.dkr.ecr.ap-southeast-4.amazonaws.com/python-flask-sample-app'
         DOCKER_IMAGE = "${ECR_REPO}:latest"
@@ -9,20 +15,40 @@ pipeline {
 
     stages {
         stage('Checkout Code') {
+            when {
+                anyOf {
+                    expression { params.STAGE_TO_RUN == 'ALL' }
+                    expression { params.STAGE_TO_RUN == 'CHECKOUT' }
+                }
+            }
             steps {
                 git branch: 'master', url: 'https://github.com/kansari2302/python-flask-sample-app.git'
             }
         }
 
         stage('Build Docker Image') {
+            when {
+                anyOf {
+                    expression { params.STAGE_TO_RUN == 'ALL' }
+                    expression { params.STAGE_TO_RUN == 'BUILD' }
+                }
+            }
             steps {
+                echo "Building Docker image ${IMAGE_TAG}"
                 sh 'docker build -t python-flask-sample-app .'
             }
         }
 
         stage('Login to ECR') {
+            when {
+                anyOf {
+                    expression { params.STAGE_TO_RUN == 'ALL' }
+                    expression { params.STAGE_TO_RUN == 'PUSH' }
+                }
+            }
             steps {
                 withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
+                    echo "Logging in to ECR..."
                     sh '''
                     echo "DEBUG: Logging into ECR..."
                     aws sts get-caller-identity
@@ -34,6 +60,12 @@ pipeline {
         }
 
         stage('Push Docker Image to ECR') {
+            when {
+                anyOf {
+                    expression { params.STAGE_TO_RUN == 'ALL' }
+                    expression { params.STAGE_TO_RUN == 'PUSH' }
+                }
+            }
             steps {
                 sh 'docker tag python-flask-sample-app:latest $DOCKER_IMAGE'
                 sh 'docker push $DOCKER_IMAGE'
@@ -41,6 +73,12 @@ pipeline {
         }
 
         stage('Deploy to EKS') {
+            when {
+                anyOf {
+                    expression { params.STAGE_TO_RUN == 'ALL' }
+                    expression { params.STAGE_TO_RUN == 'DEPLOY' }
+                }
+            }
             steps {
                 withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
                     sh '''
