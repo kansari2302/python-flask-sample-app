@@ -12,7 +12,7 @@ setup(
     url="https://flask.palletsprojects.com/tutorial/",
     license="BSD",
     maintainer="Pallets team",
-    maintainer_email="contact@palletsprojects.com",
+    maintainer_email="kansari2302@gmail.com",
     description="The basic blog app built in the Flask tutorial.",
     long_description=readme,
     packages=find_packages(),

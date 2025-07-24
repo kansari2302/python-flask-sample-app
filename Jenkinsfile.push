@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'ap-southeast-4'
+        ACCOUNT_ID = '<your-account-id>'
+        IMAGE_NAME = 'python-flask-sample-app'
+        IMAGE_TAG = 'latest'
+        ECR_REPO = 'python-flask-sample-app'
+        ECR_URI = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
+    }
+
+    stages {
+        stage('Login to ECR') {
+            steps {
+                echo "Logging into ECR..."
+                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+            }
+        }
+
+        stage('Tag and Push Image') {
+            steps {
+                echo "Tagging and pushing image to ECR..."
+                sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_URI}:${IMAGE_TAG}"
+                sh "docker push ${ECR_URI}:${IMAGE_TAG}"
+            }
+        }
+    }
+}
