@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         APP_NAME = "python-flask-sample-app"
+        ACCOUNT_ID = '686255978515'
         IMAGE_TAG = "${APP_NAME}:${BUILD_NUMBER}"
         AWS_REGION = 'ap-southeast-4'
         ECR_REPO = '686255978515.dkr.ecr.ap-southeast-4.amazonaws.com/python-flask-sample-app'
@@ -53,7 +54,9 @@ pipeline {
                     echo "DEBUG: Logging into ECR..."
                     aws sts get-caller-identity
                     aws ecr get-login-password --region $AWS_REGION | \
-                    docker login --username AWS --password-stdin 686255978515.dkr.ecr.ap-southeast-4.amazonaws.com
+                    // docker login --username AWS --password-stdin 686255978515.dkr.ecr.ap-southeast-4.amazonaws.com
+                    echo "Logging into ECR..."
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
                     '''
                 }
             }

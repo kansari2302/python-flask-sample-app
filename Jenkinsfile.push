@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'ap-southeast-4'
-        ACCOUNT_ID = '<your-account-id>'
+        ACCOUNT_ID = '686255978515'
         IMAGE_NAME = 'python-flask-sample-app'
         IMAGE_TAG = 'latest'
         ECR_REPO = 'python-flask-sample-app'
