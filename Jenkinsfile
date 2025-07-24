@@ -53,7 +53,7 @@ pipeline {
                     echo "DEBUG: Logging into ECR..."
                     aws sts get-caller-identity
                     aws ecr get-login-password --region $AWS_REGION | \
-                    docker login --username AWS --password-stdin $ECR_REPO
+                    docker login --username AWS --password-stdin 686255978515.dkr.ecr.ap-southeast-4.amazonaws.com
                     '''
                 }
             }
