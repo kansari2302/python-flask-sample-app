@@ -36,7 +36,7 @@ pipeline {
             }
             steps {
                 echo "Building Docker image ${IMAGE_TAG}"
-                sh 'docker build -t python-flask-sample-app .'
+                sh "docker build -t ${IMAGE_TAG} ."
             }
         }
 
@@ -51,12 +51,8 @@ pipeline {
                 withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
                     echo "Logging in to ECR..."
                     sh '''
-                    echo "DEBUG: Logging into ECR..."
-                    aws sts get-caller-identity
-                    aws ecr get-login-password --region $AWS_REGION | \
-                    // docker login --username AWS --password-stdin 686255978515.dkr.ecr.ap-southeast-4.amazonaws.com
-                    echo "Logging into ECR..."
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                        aws sts get-caller-identity
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                     '''
                 }
             }
@@ -70,8 +66,9 @@ pipeline {
                 }
             }
             steps {
-                sh 'docker tag python-flask-sample-app:latest $DOCKER_IMAGE'
-                sh 'docker push $DOCKER_IMAGE'
+                sh "docker tag ${IMAGE_TAG} ${DOCKER_IMAGE}"
+                sh "docker push ${DOCKER_IMAGE}"
+                echo "Docker image ${DOCKER_IMAGE} pushed to ECR"
             }
         }
 
