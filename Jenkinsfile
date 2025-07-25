@@ -15,17 +15,17 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
-            when {
-                anyOf {
-                    expression { params.STAGE_TO_RUN == 'ALL' }
-                    expression { params.STAGE_TO_RUN == 'CHECKOUT' }
-                }
-            }
-            steps {
-                git branch: 'master', url: 'https://github.com/kansari2302/python-flask-sample-app.git'
-            }
-        }
+        // stage('Checkout Code') {
+        //     when {
+        //         anyOf {
+        //             expression { params.STAGE_TO_RUN == 'ALL' }
+        //             expression { params.STAGE_TO_RUN == 'CHECKOUT' }
+        //         }
+        //     }
+        //     steps {
+        //         git branch: 'master', url: 'https://github.com/kansari2302/python-flask-sample-app.git'
+        //     }
+        // }
 
         stage('Build Docker Image') {
             when {
